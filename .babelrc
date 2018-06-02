@@ -1,7 +1,7 @@
 {
   "presets": [
     ["env", {
-      "modules": "commonjs"
+      "modules": false
     }],
     "jest",
     "stage-0"

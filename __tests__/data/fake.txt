@@ -1,3 +1,0 @@
-// TODO: This line should be included
-sample text
-// TODO: And also this line

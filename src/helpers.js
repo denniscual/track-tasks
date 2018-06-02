@@ -1,59 +1,62 @@
-import isEmpty from 'lodash.isempty'
+import { findTextInFiles } from 'find-text'
+// for prettier text
+import { blue, gray, yellow } from 'colors'
 
 /**
- * getFileName :: String => String
- *
- * It returns a path which is relative to given pattern path. It removes the cwd (current working directory) path that leave only the necessary path.
- * @param {String} path
- * @return {String} file name
+ * Performs right-to-left function composition.
  */
-export const getRelativePath = (path) => path.replace(`${process.cwd()}/`, '')
+export const compose = (...fns) => fns.reduce((f, g) => (...args) => f(g(...args)))
 
 /**
- * getFoundText :: (String, Object) => Array
- *
- * Extract the line with found text in the given file.
- * @param {String} word
- * @param {Object} meta information
- * @return {Object} result (fileName, matches, count)
+ * cleanLineText :: String => String => String
+ * 
+ * Remove unnecessary characters on the line text to be more readable based on the given command name. The final output is also trimmed.
+ * @param {String} cmd is a command name.
+ * @param {String} text is a line text
+ * @return {String} New text.
  */
-export const getFoundText = (content, {word, path}) => {
-  // split the content of the file by newline. Return array of lines(line of strings read in given file)
-  const lines = content.split('\n')
-
-  // Transform the elements of lines into object. The object should have properties of
-  // text and lineNumber. Use 'map' method for tranforming the lines array. Use the index parameter (add 1 because index is zero-based number) which is passed in 'map' for getting the line number of each line.
-  const transformLines = lines.map((line, i) => ({
-    text: line,
-    lineNumber: i + 1
-  }))
-
-  // Filter only the the line which include the found string
-  const filteredLines = transformLines
-    .filter((line) => line.text.includes(word))
-
-  // Create an object which has attributes of matches and count. Use 'reduce' method
-  const result = filteredLines.reduce((acc, line) => {
-    const { matches } = acc
-    // Handle if the matches is defined or undefined. If defined, retain the matches data. Else
-    // assign a new array with the line element
-    const updatedMatches = matches ? matches.concat(line) : [line]
-    // return new acc
-    return {
-      fileName: getRelativePath(path),
-      matches: updatedMatches,
-      count: updatedMatches.length // count matches
-    }
-  }, {})
-
-  return result
+const cleanLineText = (cmd) => (text) => {
+  // Handle if the command is todo
+  if (cmd === 'TODO') {
+    return text.replace('// TODO:', '').trim()
+  }
+  // Handle if the comman is fixme
+  return text.replace('// FIXME:', '').trim()
 }
 
 /**
- * removeNull :: Array(a) => Array(a)
+ * prettierText :: Array => void
  *
- * It remove the included null or empty object element on the array.
- * @param {Array} arr
- * @return {Array} Filtered array.
+ * Display the results on the console with the pretty format.
+ * @param {Array} results
+ * @return {Void}
  */
-export const removeNil = (arr) => arr.filter((elem) => !isEmpty(elem))
+const prettierText = (cmd) => (results) => {
+  // iterate to each results
+  results.forEach((result) => {
+    const { fileName, matches } = result
+    // log the filename
+    console.info(blue(fileName))
+    // iterate to each matches line of strings
+    matches.forEach((line) => {
+      const coloredLineNumber = gray(`(${line.lineNumber})`)
+      const coloredLineText = compose(yellow, cleanLineText(cmd))
+      // log the line information
+      console.info(`  ${yellow('-')} ${coloredLineText(line.text)} ${coloredLineNumber}`)
+    })
+  })
+}
+
+// action fires when the command todo triggers
+export const todoAction = (pattern) => {
+  findTextInFiles('TODO', pattern)
+    .then(prettierText('TODO'))
+    .catch(console.error)
+}
+
+// action fires when the command fixme triggers
+export const fixmeAction = (pattern) => {
+  findTextInFiles('FIXME', pattern)
+    .then(prettierText('FIXME'))
+    .catch(console.error)
+}
