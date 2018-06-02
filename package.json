@@ -1,11 +1,11 @@
 {
-  "name": "find-text",
+  "name": "track-tasks",
   "version": "1.1.1",
-  "description": "Fast, minimal, and easy to use tool for finding text across multiple files",
+  "description": "a CLI app where it will display all the files , in recursive way, which includes special commented text - TODO and FIXME",
   "main": "dist/index.js",
   "author": "denniscual <mamaylovepapay@outlook.com>",
   "license": "MIT",
-  "repository": "https://github.com/denniscual/find-text",
+  "repository": "https://github.com/denniscual/track-tasks",
   "module": "dist/index.es.js",
   "jsnext:main": "dist/index.es.js",
   "scripts": {
