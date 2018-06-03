@@ -1,6 +1,5 @@
-#!/usr/bin/env node
-import program from 'commander'
-import { todoAction, fixmeAction } from './helpers'
+const program = require('commander')
+const { todoAction, fixmeAction } = require('./helpers')
 
 // add version to cli program
 program.version('0.1.0')
