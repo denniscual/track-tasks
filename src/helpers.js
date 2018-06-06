@@ -4,6 +4,10 @@ const chalk = require('chalk')
 
 const { info } = console
 
+// Constant variables
+const TODO = 'TODO'
+const FIXME = 'FIXME'
+
 /**
  * Performs right-to-left function composition.
  */
@@ -11,19 +15,25 @@ exports.compose = (...fns) => fns.reduce((f, g) => (...args) => f(g(...args)))
 
 /**
  * cleanLineText :: String => String => String
- * 
+ *
  * Remove unnecessary characters on the line text to be more readable based on the given command name. The final output is also trimmed.
- * @param {String} cmd is a command name.
+ * @param {String} cmd is a command name. Either TODO or FIXME.
  * @param {String} text is a line text
  * @return {String} New text.
  */
 exports.cleanLineText = (cmd) => (text) => {
-  // Handle if the command is todo
-  if (cmd === 'TODO') {
-    return text.replace('// TODO:', '').trim()
-  }
-  // Handle if the comman is fixme
-  return text.replace('// FIXME:', '').trim()
+  console.log('text', text)
+  // get the first match, represent by index, based on the given string (cmd).
+  const index = text.search(cmd)
+  // length of cmd
+  const length = cmd.length
+  // omit the cmd word which is included in the text.
+  // We gonna add the index to length so that the extraction
+  // will start at the end of character of cmd not at the first character.
+  const newText = text.slice(index+length)
+  // remove unnecessary special character :
+  const cleanText = newText.replace(':', '').trim()
+  return cleanText
 }
 
 /**
@@ -42,7 +52,7 @@ exports.prettyFileName = (cmd, fileName) => {
   // format fileName with fixme scheme
   const formatFixme = compose(info, underline, red)
   // Handle specific color for each cmd
-  if (cmd === 'TODO') {
+  if (cmd === TODO) {
     formatTodo(fileName)
   } else {
     formatFixme(fileName)
@@ -75,14 +85,14 @@ exports.prettierText = (cmd) => (results) => {
 
 // action fires when the command todo triggers
 exports.todoAction = (pattern) => {
-  findTextInFiles('TODO', pattern)
-    .then(exports.prettierText('TODO'))
+  findTextInFiles(TODO, pattern)
+    .then(exports.prettierText(TODO))
     .catch(console.error)
 }
 
 // action fires when the command fixme triggers
 exports.fixmeAction = (pattern) => {
-  findTextInFiles('FIXME', pattern)
-    .then(exports.prettierText('FIXME'))
+  findTextInFiles(FIXME, pattern)
+    .then(exports.prettierText(FIXME))
     .catch(console.error)
 }
