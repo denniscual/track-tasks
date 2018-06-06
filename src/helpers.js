@@ -22,7 +22,6 @@ exports.compose = (...fns) => fns.reduce((f, g) => (...args) => f(g(...args)))
  * @return {String} New text.
  */
 exports.cleanLineText = (cmd) => (text) => {
-  console.log('text', text)
   // get the first match, represent by index, based on the given string (cmd).
   const index = text.search(cmd)
   // length of cmd
