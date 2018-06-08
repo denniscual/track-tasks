@@ -6,7 +6,7 @@ A command line tool where it will display all the files , in recursive way, that
 ## Install
 
 ```bash
-npm install track-tasks --global
+npm install --global track-tasks
 ```
 
 ## Usage
